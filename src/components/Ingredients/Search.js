@@ -13,8 +13,8 @@ const Search = React.memo(props => {
       if (enteredFilter === inputRef.current.value) {
         const query = enteredFilter.length === 0 ? '' : `?orderBy="title"&equalTo="${enteredFilter}"`;
         fetch('https://react-hooks-practice-3f0b3.firebaseio.com/ingredients.json' + query)
-          .then(response => response.json()
-          ).then(responseData => {
+          .then(response => response.json())
+          .then(responseData => {
             const loadedIngredients = [];
             for (const key in responseData) {
               loadedIngredients.push({
