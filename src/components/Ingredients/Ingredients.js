@@ -3,6 +3,8 @@ import ErrorModal from  '../UI/ErrorModal';
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
 import Search from './Search';
+import useHttp from '../../hooks/http';
+
 
 const ingredientReducer = (currentIngredients, action) => {
   switch (action.type) {
@@ -17,57 +19,39 @@ const ingredientReducer = (currentIngredients, action) => {
   }
 }
 
-const httpReducer = (currHttpState, action) => {
-  switch (action.type) {
-    case 'SEND':
-      return {loading: true, error: null};
-    case 'RESPONSE':
-      //This return statement overwrites the spread state with new pair (loading: false)
-      return {...currHttpState, loading: false};
-    case 'ERROR':
-      return {loading: false, error: action.errorData};
-    case 'CLEAR':
-      return {...currHttpState, error: null};
-    default: 
-      throw new Error('Should not get here!')
-  }
-} 
-
 const Ingredients = () => {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
   //const [userIngredients, setUserIngredients] = useState([]);
-  const [httpState, dispatchHttp] = useReducer(httpReducer, {
-    loading: false,
-    error: null,
-  });
   // const [error, setError] = useState();
   // const [httpState, dispatchHttp] = useReducer(httpReducer, {loading: false, error: null});
+
+  const {isLoading, error, data, sendRequest} = useHttp();
 
   useEffect(()=>{
     console.log('RENDERING INGREDIENTS', userIngredients)
   }, [userIngredients]);
 
-  const addIngredientHandler = useCallback(ingredient => {
-    dispatchHttp({type: 'SEND'});
-    fetch('https://react-hooks-practice-3f0b3.firebaseio.com/ingredients.json', {
-      method: 'POST',
-      body: JSON.stringify(ingredient),
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(response => {
-        dispatchHttp({type: 'RESPONSE'});
-        return response.json();
-      })
-      .then(responseData => {
-        // setUserIngredients(prevIngredients => [
-        //   ...prevIngredients,
-        //   { id: responseData.name, ...ingredient }
-        // ]);
-        dispatch({type: 'ADD', ingredient: {id: responseData.name, ...ingredient}})
-      }).catch(error => {
-        dispatchHttp({type: 'ERROR', errorMessage: error.message});
-      });
-  }, )
+  const addIngredientHandler = useCallback(ingredient => {})
+  //   dispatchHttp({type: 'SEND'});
+  //   fetch('https://react-hooks-practice-3f0b3.firebaseio.com/ingredients.json', {
+  //     method: 'POST',
+  //     body: JSON.stringify(ingredient),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   })
+  //     .then(response => {
+  //       dispatchHttp({type: 'RESPONSE'});
+  //       return response.json();
+  //     })
+  //     .then(responseData => {
+  //       // setUserIngredients(prevIngredients => [
+  //       //   ...prevIngredients,
+  //       //   { id: responseData.name, ...ingredient }
+  //       // ]);
+  //       dispatch({type: 'ADD', ingredient: {id: responseData.name, ...ingredient}})
+  //     }).catch(error => {
+  //       dispatchHttp({type: 'ERROR', errorMessage: error.message});
+  //     });
+  // }, )
 
   const filteredIngredientsHandler = useCallback(filteredIngredients => {
     //setUserIngredients(filteredIngredients);
@@ -75,18 +59,8 @@ const Ingredients = () => {
   }, [])
 
   const removeIngredientHandler = useCallback(ingredientId => {
-    dispatchHttp({type: 'SEND'});
-    fetch(`https://react-hooks-practice-3f0b3.firebaseio.com/ingredients/${ingredientId}.json`, {
-      method: 'DELETE',
-    }).then(response => {
-      dispatchHttp({type: 'RESPONSE'});
-    dispatch({type: 'DELETE', id: ingredientId})
-    // setUserIngredients(prevIngredients =>
-    //   prevIngredients.filter(ingredient => ingredient.id !== ingredientId)
-    }).catch(error => {
-      dispatchHttp({type: 'ERROR', errorMessage: error.message});
-    });
-  },[])
+    sendRequest(`https://react-hooks-practice-3f0b3.firebaseio.com/ingredients/${ingredientId}.json`, 'DELETE')
+  },[sendRequest])
 
   const clearError = useCallback(() => {
     dispatch({type: 'CLEAR'})
@@ -101,8 +75,8 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal> }
-      <IngredientForm loading={httpState.loading} onAddIngredient={addIngredientHandler} />
+      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal> }
+      <IngredientForm loading={isLoading} onAddIngredient={addIngredientHandler} />
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler}/>
