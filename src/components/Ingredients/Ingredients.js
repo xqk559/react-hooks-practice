@@ -54,7 +54,6 @@ const Ingredients = () => {
   // }, )
 
   const filteredIngredientsHandler = useCallback(filteredIngredients => {
-    //setUserIngredients(filteredIngredients);
     dispatch({type: 'SET', ingredients: filteredIngredients})
   }, [])
 
