@@ -35,6 +35,14 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
     <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <div id="observablehq-43089f4f"></div>
+    <script type="module">
+    import {Runtime, Inspector} from "https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.js";
+    import define from "https://api.observablehq.com/@mitvis/introduction-to-d3.js?v=3";
+    const inspect = Inspector.into("#observablehq-43089f4f");
+    (new Runtime).module(define, name => (name === "d3") && inspect());
+    </script>
     <script src="https://www.gstatic.com/firebasejs/7.10.0/firebase-app.js"></script>
 
     <!-- TODO: Add SDKs for Firebase products that you want to use
